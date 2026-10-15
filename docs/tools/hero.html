@@ -1,0 +1,123 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500&display=block" rel="stylesheet">
+<style>
+  :root {
+    --bg1: #f6f8ff; --bg2: #eaf2ff; --blob1: #c7d2fe; --blob2: #bae6fd; --blob3: #fbcfe8;
+    --ink: #0b1224; --ink2: #44506a; --muted: #7a859c; --card: #ffffff; --line: #e3e8f2; --chip: #ffffff;
+    --accent1: #2563eb; --accent2: #7c3aed; --good: #16a34a; --bad: #dc2626; --track: #e8ecf4; --skel: #e9edf5;
+    --shadow: 0 24px 48px -16px rgba(30, 41, 89, .28), 0 2px 6px rgba(30, 41, 89, .06);
+  }
+  body.dark {
+    --bg1: #070b17; --bg2: #0d1426; --blob1: #312e81; --blob2: #0c4a6e; --blob3: #581c87;
+    --ink: #f4f6fb; --ink2: #b6bfd3; --muted: #8a94ab; --card: #121a2e; --line: #23304d; --chip: #121a2e;
+    --accent1: #60a5fa; --accent2: #a78bfa; --good: #4ade80; --bad: #f87171; --track: #23304d; --skel: #1f2a44;
+    --shadow: 0 24px 48px -16px rgba(0, 0, 0, .6), 0 0 0 1px rgba(255,255,255,.04);
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; }
+  body { width: 1280px; height: 440px; overflow: hidden; font-family: Inter, -apple-system, "Segoe UI", sans-serif; color: var(--ink);
+    background: radial-gradient(520px 320px at 8% 0%, var(--blob1), transparent 70%),
+                radial-gradient(520px 360px at 92% 100%, var(--blob2), transparent 70%),
+                radial-gradient(380px 260px at 70% 0%, var(--blob3), transparent 70%),
+                linear-gradient(135deg, var(--bg1), var(--bg2)); position: relative; }
+  body.dark { background: radial-gradient(520px 320px at 8% 0%, rgba(49,46,129,.75), transparent 70%),
+                radial-gradient(520px 360px at 92% 100%, rgba(12,74,110,.8), transparent 70%),
+                radial-gradient(380px 260px at 70% 0%, rgba(88,28,135,.45), transparent 70%),
+                linear-gradient(135deg, var(--bg1), var(--bg2)); }
+  .grid { position: absolute; inset: 0; background-image: linear-gradient(var(--line) 1px, transparent 1px), linear-gradient(90deg, var(--line) 1px, transparent 1px);
+    background-size: 40px 40px; opacity: .35; mask-image: radial-gradient(600px 300px at 75% 50%, #000, transparent 75%); }
+  .left { position: absolute; left: 64px; top: 58px; width: 640px; }
+  .eyebrow { display: inline-flex; align-items: center; gap: 8px; font-size: 14px; font-weight: 600; color: var(--ink2);
+    background: var(--chip); border: 1px solid var(--line); padding: 6px 12px 6px 8px; border-radius: 999px; }
+  .eyebrow i { width: 20px; height: 20px; border-radius: 6px; background: linear-gradient(135deg, var(--accent1), var(--accent2)); display: inline-flex;
+    align-items: center; justify-content: center; color: #fff; font-style: normal; font-size: 12px; font-weight: 800; }
+  h1 { font-size: 54px; line-height: 1.04; letter-spacing: -0.035em; margin: 22px 0 18px; font-weight: 800; }
+  h1 span { background: linear-gradient(90deg, var(--accent1), var(--accent2)); -webkit-background-clip: text; background-clip: text; color: transparent; }
+  p.sub { font-size: 19px; line-height: 1.5; color: var(--ink2); margin: 0 0 24px; max-width: 590px; }
+  .pills { display: flex; gap: 10px; }
+  .pill { font-size: 14px; font-weight: 600; padding: 8px 14px; border-radius: 999px; background: var(--chip); border: 1px solid var(--line); color: var(--ink); display: flex; gap: 8px; align-items: center; }
+  .pill b { color: var(--good); }
+  .card { position: absolute; background: var(--card); border: 1px solid var(--line); border-radius: 16px; box-shadow: var(--shadow); }
+  /* score card */
+  .score { left: 742px; top: 44px; width: 318px; padding: 18px 20px; }
+  .lbl { font-size: 12px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); }
+  .rings { display: flex; align-items: center; gap: 14px; margin-top: 12px; }
+  .ring { position: relative; width: 84px; height: 84px; }
+  .ring svg { transform: rotate(-90deg); }
+  .ring b { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; font-size: 28px; font-weight: 800; letter-spacing: -.03em; }
+  .arrow { font-size: 24px; color: var(--muted); }
+  .rings small { display: block; font-size: 12.5px; color: var(--ink2); line-height: 1.4; }
+  /* post card */
+  .post { left: 902px; top: 182px; width: 330px; padding: 16px 18px; }
+  .who { display: flex; gap: 10px; align-items: center; }
+  .av { width: 38px; height: 38px; border-radius: 50%; background: linear-gradient(135deg, var(--accent1), var(--accent2)); color: #fff; font-weight: 700; font-size: 14px; display: flex; align-items: center; justify-content: center; }
+  .who b { font-size: 14px; display: block; }
+  .who span { font-size: 12px; color: var(--muted); }
+  .hook { font-size: 15.5px; font-weight: 600; margin: 12px 0 8px; }
+  .skel { height: 8px; border-radius: 4px; background: var(--skel); margin: 7px 0; }
+  .more { font-size: 13px; color: var(--muted); }
+  .badges { display: flex; gap: 8px; margin-top: 12px; }
+  .badge { font-size: 12px; font-weight: 700; padding: 5px 10px; border-radius: 8px; background: rgba(22,163,74,.12); color: var(--good); }
+  .badge.blue { background: rgba(37,99,235,.12); color: var(--accent1); }
+  /* insight card */
+  .insight { left: 700px; top: 222px; width: 186px; padding: 14px 16px; }
+  .bars { display: flex; align-items: flex-end; gap: 8px; height: 58px; margin: 10px 0 8px; }
+  .bars div { flex: 1; border-radius: 5px 5px 0 0; background: var(--track); }
+  .bars div.hi { background: linear-gradient(180deg, var(--accent1), var(--accent2)); }
+  .insight p { margin: 0; font-size: 13px; color: var(--ink2); line-height: 1.35; }
+  .insight p b { color: var(--ink); }
+  .cmd { position: absolute; left: 1086px; top: 96px; font-family: "JetBrains Mono", ui-monospace, monospace; font-size: 14px; padding: 9px 14px; border-radius: 10px;
+    background: #0b1224; color: #e2e8f0; box-shadow: var(--shadow); }
+  body.dark .cmd { background: #1e293b; }
+  .cmd span { color: #a78bfa; }
+  body.social { height: 640px; }
+  body.social > *:not(.grid):not(script) { transform: translateY(100px); }
+  body.social .grid { mask-image: radial-gradient(700px 400px at 75% 55%, #000, transparent 75%); }
+</style>
+</head>
+<body>
+<script>if (/dark/.test(location.search + location.hash)) document.body.classList.add('dark'); if (/social/.test(location.search)) document.body.classList.add('social');</script>
+<div class="grid"></div>
+<div class="left">
+  <div class="eyebrow"><i>↗</i>Claude Code plugin · free &amp; open source</div>
+  <h1>Your LinkedIn strategist,<br><span>inside Claude Code.</span></h1>
+  <p class="sub">Audit your profile, find your niche, know who to follow, and write posts that don't sound like AI. Built on your own LinkedIn data.</p>
+  <div class="pills">
+    <div class="pill"><b>✓</b>No scraping</div>
+    <div class="pill"><b>✓</b>No API keys</div>
+    <div class="pill"><b>✓</b>Never invents facts</div>
+  </div>
+</div>
+
+<div class="card score">
+  <div class="lbl">Profile score</div>
+  <div class="rings">
+    <div class="ring"><svg width="84" height="84"><circle cx="42" cy="42" r="35" fill="none" stroke="var(--track)" stroke-width="8"/><circle cx="42" cy="42" r="35" fill="none" stroke="var(--bad)" stroke-width="8" stroke-linecap="round" stroke-dasharray="219.9" stroke-dashoffset="160.5"/></svg><b>27</b></div>
+    <div class="arrow">→</div>
+    <div class="ring"><svg width="84" height="84"><circle cx="42" cy="42" r="35" fill="none" stroke="var(--track)" stroke-width="8"/><circle cx="42" cy="42" r="35" fill="none" stroke="var(--good)" stroke-width="8" stroke-linecap="round" stroke-dasharray="219.9" stroke-dashoffset="44"/></svg><b>80</b></div>
+    <div><small>after<br>fixes</small></div>
+  </div>
+</div>
+
+<div class="cmd"><span>/linkedin:</span>audit</div>
+
+<div class="card insight">
+  <div class="lbl">Works for you</div>
+  <div class="bars"><div style="height:30%"></div><div style="height:45%"></div><div class="hi" style="height:100%"></div><div style="height:38%"></div><div class="hi" style="height:84%"></div></div>
+  <p>Posts opening with a real number: <b>1.67×</b> your median</p>
+</div>
+
+<div class="card post">
+  <div class="who"><div class="av">PR</div><div><b>Priya Raman</b><span>Fractional CFO for seed–Series A SaaS</span></div></div>
+  <div class="hook">Diligence took 3 weeks instead of 8.</div>
+  <div class="skel" style="width:92%"></div>
+  <div class="skel" style="width:76%"></div>
+  <div class="more">…more</div>
+  <div class="badges"><span class="badge">Slop check 100/100</span><span class="badge blue">Sounds like you</span></div>
+</div>
+</body>
+</html>

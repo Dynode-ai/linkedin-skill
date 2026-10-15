@@ -52,6 +52,16 @@ class CheckPost(unittest.TestCase):
         self.assertLessEqual(r["score"], 70)
         self.assertTrue(any(i["rule"] == "specificity" for i in r["issues"]))
 
+    def test_placeholders_any_case(self):
+        # Found in a live test: lowercase gaps used to slip through and score 100/100.
+        def holes(txt):
+            r = json.loads(run("check.py", "post", "--text", txt, "--json"))
+            return [i["match"] for i in r["issues"] if i["rule"] == "placeholder"]
+        self.assertEqual(holes("Covered by [who covers it, e.g. someone stays late] every week."), ["[who covers it, e.g. someone stays late]"])
+        self.assertEqual(holes("Revenue grew XX% last year."), ["XX%"])
+        self.assertEqual(holes("Our [NUMBER] signups."), ["[NUMBER]"])
+        self.assertEqual(holes("See [our guide](https://x.com) for details."), [])
+
     def test_fold_simulation(self):
         r = self.check("good-post.md")
         self.assertEqual(r["above_fold"]["mobile"][0], "We cut customer onboarding from 14 days to 3.")

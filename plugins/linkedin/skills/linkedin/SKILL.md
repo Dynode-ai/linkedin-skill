@@ -54,7 +54,7 @@ linkedin/
 
 **After every workflow:** update the workspace files you learned something for, and tell the user in one line what you saved.
 
-If `./linkedin/` would land somewhere odd (for example inside an unrelated code repository), ask where they'd like their LinkedIn folder before creating it. Workspace files may contain personal data. If the folder is inside a git repo, suggest adding `/linkedin/` to `.gitignore`.
+If `./linkedin/` would land somewhere odd (for example inside an unrelated code repository), ask where they'd like their LinkedIn folder before creating it. Workspace files may contain personal data. If the folder is inside a git repo, suggest adding `/linkedin/` to `.gitignore` once (not again in later turns).
 
 ## 3. Getting the user's LinkedIn data (no scraping)
 
@@ -83,14 +83,13 @@ Public web pages about the user (personal site, company page, talks, articles) a
 
 ## 5. Scripts and visual outputs
 
-The scripts use only the Python standard library (3.8+). Find a working interpreter once per session, before the first script, and reuse it. Try these in order:
-1. `python3 --version`
-2. `python --version`
-3. `py -3 --version` (Windows)
-4. any versioned `python3.N` on PATH (check with `ls ~/.local/bin` or `where python*` on Windows)
-5. `uv run --no-project python` if `uv` is installed. It may download a Python runtime the first time; mention that to the user.
+The scripts use only the Python standard library (3.8+). Before the first script in a session, find an interpreter with this exact command (Bash). It checks the common names and versioned installs, skips the Windows Store stub, and prints the interpreter's full path:
 
-On Windows, a "Python was not found" message comes from the Microsoft Store stub and means "not installed". If nothing works, do the same checks manually from the rules in the references (Node can count characters too), and tell the user once that installing Python enables the automatic checks and analytics.
+```bash
+for c in python3 python "py -3" python3.14 python3.13 python3.12 python3.11 python3.10 python3.9 python3.8 ~/.local/bin/python3.1[0-9] ~/.local/bin/python3.[89]; do $c -c "import sys; assert sys.version_info >= (3, 8); print(sys.executable)" 2>/dev/null && break; done
+```
+
+Use the printed path (quoted) for every script call in this session. If it prints nothing but `uv` is installed, use `uv run --no-project python` (it may download a Python runtime the first time; mention that to the user). If nothing works, do the same checks manually from the rules in the references (Node can count characters too), and tell the user once that installing Python enables the automatic checks and analytics.
 
 In the commands below and in the workflows, `python3` means whichever interpreter you found.
 

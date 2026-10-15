@@ -85,7 +85,8 @@ STRUCTURE = [
 URL_RE = re.compile(r"(https?://|www\.)\S+|\b[a-z0-9-]+\.(com|io|ai|co|org|net|dev|app)(/\S*)?\b", re.I)
 HASHTAG_RE = re.compile(r"(?<![\w&])#[A-Za-z][\w]*")
 MENTION_RE = re.compile(r"(?<!\w)@[A-Za-z][\w.-]+")
-PLACEHOLDER_RE = re.compile(r"\[(?:[A-Z0-9][A-Z0-9 _/'’.,:%$#-]{2,}|TODO|TK)\]|\bTK\b|\{\{.*?\}\}")
+# Any [bracketed gap] (but not a Markdown [link](url)), TK, {{var}} or XX% the user still has to fill.
+PLACEHOLDER_RE = re.compile(r"\[[^\[\]\n]{2,160}\](?!\()|\bTK\b|\{\{.*?\}\}|\bX{2,}%?(?![A-Za-z])")
 EMOJI_RE = re.compile("[\U0001F300-\U0001FAFF\U00002600-\U000027BF\U0001F000-\U0001F2FF⭐⬆↔-⇿✅❌✔]")
 MATH_ALNUM_RE = re.compile("[\U0001D400-\U0001D7FF]")  # unicode "bold/italic" fonts
 EMDASH_RE = re.compile("—")
