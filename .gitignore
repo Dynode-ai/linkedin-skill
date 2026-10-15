@@ -1,0 +1,18 @@
+# Local test output and eval workspaces
+tests/output/
+*-workspace/
+__pycache__/
+*.pyc
+
+# Personal LinkedIn workspaces (never commit your own data)
+/linkedin/
+
+# Editor / OS / local tooling
+.claude/
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+
+# Private launch notes
+LAUNCH_KIT.md

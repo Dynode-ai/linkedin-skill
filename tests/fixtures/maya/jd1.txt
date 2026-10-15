@@ -1,0 +1,18 @@
+Machine Learning Engineer, Personalization - Cartwheel (e-commerce marketplace, Series B, Remote US)
+
+About the role
+You'll build and ship the models behind Cartwheel's recommendations and search ranking, used by 4M monthly shoppers.
+
+What you'll do
+- Design, train and deploy recommender and ranking models (two-tower, gradient boosted trees, learning-to-rank)
+- Build feature pipelines and own models in production: monitoring, retraining, A/B testing
+- Partner with product and data science to define success metrics
+
+What we're looking for
+- 3+ years building ML systems; experience deploying models to production
+- Strong Python and SQL; PyTorch or TensorFlow
+- Experience with recommender systems or ranking
+- MLOps: MLflow or similar, Docker, Kubernetes, CI/CD
+- AWS (SageMaker a plus), Spark
+- Experience designing and analyzing A/B tests
+Nice to have: retail or e-commerce domain experience, feature stores (Feast), dbt

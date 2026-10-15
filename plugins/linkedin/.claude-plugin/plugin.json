@@ -1,0 +1,25 @@
+{
+  "name": "linkedin",
+  "displayName": "LinkedIn Growth",
+  "version": "1.0.0",
+  "description": "Your LinkedIn strategist in Claude Code. Profile audit with a 100-point score and ready-to-paste rewrites, niche and audience research, real accounts to follow (never-guessed links), content ideas from your own stories, posts and carousels in your voice with an anti-AI-slop checker, and analytics from your own LinkedIn exports. No scraping, no API keys.",
+  "author": {
+    "name": "Dynode.ai",
+    "url": "https://github.com/Dynode-ai"
+  },
+  "homepage": "https://github.com/Dynode-ai/linkedin-skill",
+  "repository": "https://github.com/Dynode-ai/linkedin-skill",
+  "license": "MIT",
+  "keywords": [
+    "linkedin",
+    "personal-brand",
+    "profile",
+    "content",
+    "ghostwriting",
+    "carousel",
+    "analytics",
+    "career",
+    "job-search",
+    "b2b"
+  ]
+}

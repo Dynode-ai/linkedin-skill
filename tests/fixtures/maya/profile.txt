@@ -1,0 +1,41 @@
+(Copied from my LinkedIn "Save to PDF" export)
+
+Maya Chen
+Senior Data Analyst at Northwind Retail
+Austin, Texas, United States
+
+Contact
+www.linkedin.com/in/maya-chen-48a1b2c3
+
+Top Skills
+SQL
+Tableau
+Microsoft Excel
+
+Certifications
+Deep Learning Specialization (Coursera, 2024)
+
+Summary
+Data analyst with 6 years of experience. I love turning data into insights and I'm passionate about machine learning. Skilled in SQL, Python, Tableau. Always learning!
+
+Experience
+Northwind Retail
+Senior Data Analyst
+March 2022 - Present (2 years 8 months)
+Austin, Texas
+Responsible for building dashboards and reports for the merchandising team. Worked with stakeholders to define KPIs. Built a demand forecasting model in Python that the merchandising team now uses for weekly replenishment. Mentored two junior analysts.
+
+Lone Star Health
+Data Analyst
+June 2019 - February 2022 (2 years 9 months)
+Dallas, Texas
+Created SQL queries and reports. Supported the analytics team with ad-hoc analysis. Automated a monthly claims report in Python.
+
+Education
+Texas A&M University
+Bachelor of Science - BS, Statistics · (2015 - 2019)
+
+Projects (from my profile)
+Store-level demand forecasting with LightGBM - personal project on GitHub (github.com/mayachen/retail-forecast)
+
+Other notes: no Featured section, 1 recommendation (from 2020), ~430 connections, I haven't posted in about a year.

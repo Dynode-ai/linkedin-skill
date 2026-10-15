@@ -1,0 +1,17 @@
+ML Engineer - Demand Forecasting - FreshCart Grocery (Austin, TX / hybrid)
+
+FreshCart is a regional grocery chain with 140 stores. Our forecasting team predicts demand for 30,000 products every day.
+
+Responsibilities
+- Build, deploy and maintain time series forecasting models (LightGBM, XGBoost, Prophet, deep learning) at store/SKU level
+- Productionize models with Airflow, Docker and CI/CD; monitor drift and accuracy (MAPE, WAPE, bias)
+- Work with merchandising and supply chain to turn forecasts into replenishment decisions
+- Improve feature engineering: promotions, holidays, weather, price elasticity
+
+Requirements
+- 3+ years in data science or ML engineering
+- Python (pandas, scikit-learn, LightGBM), SQL, Snowflake
+- Experience taking models from notebook to production
+- Model monitoring and experiment tracking (MLflow)
+- Clear communication with non-technical stakeholders
+Bonus: retail forecasting experience, dbt, cloud (AWS or GCP)

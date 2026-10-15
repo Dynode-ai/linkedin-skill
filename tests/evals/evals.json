@@ -1,0 +1,18 @@
+{
+  "skill_name": "linkedin",
+  "note": "Prompts end with a no-follow-up clause because evals run headless (claude -p). Real users can answer questions.",
+  "evals": [
+    {"id": 1, "name": "audit-job-seeker", "files": ["fixtures/maya/profile.txt", "fixtures/maya/jd1.txt", "fixtures/maya/jd2.txt"],
+     "prompt": "My LinkedIn profile is in profile.txt (copied from the PDF export) and jd1.txt / jd2.txt are two ML engineer jobs I'm targeting. Audit my profile and rewrite it so I start getting interviews for ML engineer roles. I can't answer follow-up questions right now, so make reasonable assumptions, note them, and save everything you produce in this folder.",
+     "expected_output": "Scored audit tied to the ML engineer goal, keyword gaps from both JDs, 3 headline options under 220 chars, About and experience rewrites with no invented metrics (placeholders instead), HTML report, workspace files."},
+    {"id": 2, "name": "follow-founder", "files": [],
+     "prompt": "I'm Tom Becker, co-founder and CEO of SiteLoop, project management software for mid-size commercial construction contractors in the US (think $20M-$200M general contractors). I want LinkedIn to put me in front of construction operations leaders, project executives and owners of GC firms. Who specifically should I follow and engage with on LinkedIn, and how should I engage? I can't answer follow-up questions right now, so make reasonable assumptions and save what you produce in this folder.",
+     "expected_output": "Tiered list of real accounts with LinkedIn URLs seen in search results, evidence of recent activity, a not-verified list, a concrete daily engagement routine, people.md saved."},
+    {"id": 3, "name": "analyze-priya", "files": ["fixtures/priya/Basic_LinkedInDataExport_10-14-2026.zip", "fixtures/priya/AggregateAnalytics_Priya_Raman_2025-10-15_2026-10-14.xlsx"],
+     "prompt": "I exported my LinkedIn data archive and my analytics (both files are in the data/ folder). I'm a fractional CFO for seed to Series A SaaS startups and I want more founders to hire me. What's actually working in my content, what should I change, and is my profile helping? I can't answer follow-up questions right now, so make reasonable assumptions and save what you produce in this folder.",
+     "expected_output": "Parses both exports, joins text to metrics, personal benchmarks with sample sizes, audience-fit finding (few CFO/founder buyers vs target), profile misalignment (generic headline/About), off-topic posts underperform, dashboard, learnings saved."},
+    {"id": 4, "name": "ideas-priya", "files": ["fixtures/priya/Basic_LinkedInDataExport_10-14-2026.zip"],
+     "prompt": "I'm a fractional CFO for seed to Series A SaaS startups (my LinkedIn data archive is in data/). Give me a month of LinkedIn post ideas that will get founders to hire me, and write the first post so it's ready to publish. I can't answer follow-up questions right now, so make reasonable assumptions and save what you produce in this folder.",
+     "expected_output": "Ideas grounded in her real stories from Shares.csv, hooks, pillars, a calendar at sustainable cadence, one post in her voice that passes the checker with no invented facts."}
+  ]
+}

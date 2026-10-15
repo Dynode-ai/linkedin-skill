@@ -1,0 +1,152 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Post Preview</title>
+<style>
+  :root {
+    --page: #f4f2ee; --card: #ffffff; --ink: #191919; --muted: #666666; --line: #e0dfdc; --accent: #0a66c2;
+    --chip: #eef3f8; --warn: #b24020; --ok: #057642; --mono: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --page: #000000; --card: #1b1f23; --ink: #e9e9e9; --muted: #a8a8a8; --line: #38434f; --accent: #71b7fb;
+      --chip: #263340; --warn: #f5987e; --ok: #7fc15e;
+    }
+  }
+  :root[data-theme="dark"] {
+    --page: #000000; --card: #1b1f23; --ink: #e9e9e9; --muted: #a8a8a8; --line: #38434f; --accent: #71b7fb;
+    --chip: #263340; --warn: #f5987e; --ok: #7fc15e;
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--page); color: var(--ink);
+    font: 14px/1.43 -apple-system, system-ui, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; }
+  .wrap { max-width: 1080px; margin: 0 auto; padding: 24px 16px 60px; }
+  h1 { font-size: 20px; margin: 0 0 4px; }
+  .lede { color: var(--muted); margin: 0 0 20px; font-size: 13.5px; }
+  .draft { margin-bottom: 34px; }
+  .draft > h2 { font-size: 15px; margin: 0 0 10px; display: flex; gap: 10px; align-items: baseline; flex-wrap: wrap; }
+  .count { font-family: var(--mono); font-size: 12px; color: var(--muted); font-weight: 400; }
+  .count.over { color: var(--warn); font-weight: 700; }
+  .frames { display: flex; gap: 22px; align-items: flex-start; flex-wrap: wrap; }
+  .frame { flex: none; }
+  .frame .lbl { font-size: 11.5px; text-transform: uppercase; letter-spacing: .06em; color: var(--muted); margin-bottom: 6px; }
+  .post { background: var(--card); border: 1px solid var(--line); border-radius: 10px; padding: 12px 16px 10px; }
+  .frame.mobile .post { width: 360px; border-radius: 0; border-left: 0; border-right: 0; }
+  .frame.desktop .post { width: 555px; }
+  @media (max-width: 640px) { .frame.desktop { display: none; } .frame.mobile .post { width: calc(100vw - 32px); } }
+  .who { display: flex; gap: 8px; margin-bottom: 10px; }
+  .av { width: 48px; height: 48px; border-radius: 50%; background: var(--accent); color: #fff; display: flex; align-items: center; justify-content: center; font-weight: 600; flex: none; }
+  .who .n { font-weight: 600; font-size: 14px; }
+  .who .h, .who .t { color: var(--muted); font-size: 12px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .who > div { min-width: 0; }
+  .text { white-space: pre-wrap; word-wrap: break-word; font-size: 14px; line-height: 20px; }
+  .more { background: none; border: 0; padding: 0 0 0 2px; color: var(--muted); font: inherit; font-size: 14px; line-height: 20px; cursor: pointer; }
+  .more:hover { color: var(--accent); text-decoration: underline; }
+  .bar { display: flex; justify-content: space-between; color: var(--muted); font-size: 12px; border-top: 1px solid var(--line); margin-top: 12px; padding-top: 8px; clear: both; }
+  .tools { margin-top: 10px; display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
+  button.b { font: inherit; font-size: 13px; border: 1px solid var(--line); background: var(--card); color: var(--ink); border-radius: 16px; padding: 5px 14px; cursor: pointer; }
+  button.b:hover { border-color: var(--accent); color: var(--accent); }
+  button.b.done { color: var(--ok); border-color: var(--ok); }
+  textarea { width: 100%; min-height: 220px; margin-top: 10px; font: 14px/20px inherit; font-family: inherit; color: var(--ink); background: var(--card);
+    border: 1px solid var(--line); border-radius: 8px; padding: 10px 12px; display: none; }
+  textarea.on { display: block; }
+  .fold { font-size: 12.5px; color: var(--muted); margin-top: 6px; }
+  .empty { text-align: center; padding: 80px 20px; color: var(--muted); }
+</style>
+</head>
+<body>
+<div class="wrap" id="app"><div class="empty">Loading… If this stays empty, <code>data.js</code> is missing next to this file.</div></div>
+<script src="data.js"></script>
+<script>
+(function () {
+  var D = window.POSTS;
+  var app = document.getElementById('app');
+  if (!D) return;
+  var author = D.author || {};
+  function el(tag, attrs, parent, text) {
+    var e = document.createElement(tag);
+    if (attrs) for (var k in attrs) e.setAttribute(k, attrs[k]);
+    if (text != null) e.textContent = text;
+    if (parent) parent.appendChild(e);
+    return e;
+  }
+  function initials(n) { return String(n || '?').split(/\s+/).filter(Boolean).slice(0, 2).map(function (w) { return w[0].toUpperCase(); }).join(''); }
+  function chars(s) { return Array.from(s || '').length; }
+
+  app.textContent = '';
+  el('h1', null, app, 'Post preview');
+  el('p', { class: 'lede' }, app, 'How each draft looks in the feed before "…more". Most LinkedIn reading happens on mobile, so the mobile cut is the one that matters. Click "Edit" to change the text live.');
+
+  (D.drafts || []).forEach(function (dr, idx) {
+    var box = el('section', { class: 'draft' }, app);
+    var h = el('h2', null, box, dr.label || ('Draft ' + (idx + 1)));
+    var cnt = el('span', { class: 'count' }, h);
+    var frames = el('div', { class: 'frames' }, box);
+    var views = [];
+    [['mobile', 'Mobile'], ['desktop', 'Desktop']].forEach(function (f) {
+      var fr = el('div', { class: 'frame ' + f[0] }, frames);
+      el('div', { class: 'lbl' }, fr, f[1]);
+      var post = el('div', { class: 'post' }, fr);
+      var who = el('div', { class: 'who' }, post);
+      el('div', { class: 'av' }, who, initials(author.name));
+      var meta = el('div', null, who);
+      el('div', { class: 'n' }, meta, author.name || 'Your name');
+      el('div', { class: 'h' }, meta, author.headline || '');
+      el('div', { class: 't' }, meta, 'Now · Public');
+      var txt = el('div', { class: 'text' }, post);
+      el('div', { class: 'bar' }, post).innerHTML = '<span>Like</span><span>Comment</span><span>Repost</span><span>Send</span>';
+      var fold = el('div', { class: 'fold' }, fr);
+      views.push({ txt: txt, fold: fold, expanded: false, cut: null, full: '' });
+    });
+    var tools = el('div', { class: 'tools' }, box);
+    var copy = el('button', { class: 'b', type: 'button' }, tools, 'Copy text');
+    var edit = el('button', { class: 'b', type: 'button' }, tools, 'Edit');
+    var ta = el('textarea', { 'aria-label': 'Edit post text' }, box);
+    ta.value = dr.text || '';
+
+    function render() {
+      var t = ta.value;
+      var n = chars(t);
+      cnt.textContent = n + ' / 3000 characters';
+      cnt.className = 'count' + (n > 3000 ? ' over' : '');
+      views.forEach(function (v) { v.full = t; v.expanded = false; v.cut = measure(v.txt, t); paint(v); });
+    }
+    function paint(v) {
+      v.txt.textContent = '';
+      if (v.cut == null) { v.txt.textContent = v.full; v.fold.textContent = 'Fits without "…more"'; return; }
+      var b = document.createElement('button'); b.type = 'button'; b.className = 'more';
+      if (v.expanded) { v.txt.appendChild(document.createTextNode(v.full + ' ')); b.textContent = 'show less'; }
+      else { v.txt.appendChild(document.createTextNode(v.full.slice(0, v.cut).replace(/\s+$/, '') + '…')); b.textContent = 'more'; }
+      b.addEventListener('click', function () { v.expanded = !v.expanded; paint(v); });
+      v.txt.appendChild(b);
+      v.fold.textContent = 'Readers see the first ~' + v.cut + ' characters before "…more"';
+    }
+    function measure(node, t) {
+      // Returns null if the whole post fits in 3 lines, else the longest prefix that fits with "…more".
+      var probe = node.cloneNode(false); probe.style.position = 'absolute'; probe.style.visibility = 'hidden';
+      probe.style.width = node.clientWidth + 'px';
+      node.parentNode.appendChild(probe);
+      var max = 3 * 20 + 1;
+      probe.textContent = t;
+      if (probe.offsetHeight <= max) { probe.remove(); return null; }
+      var lo = 0, hi = t.length;
+      while (lo < hi) { var mid = (lo + hi + 1) >> 1; probe.textContent = t.slice(0, mid).replace(/\s+$/, '') + '… more'; if (probe.offsetHeight <= max) lo = mid; else hi = mid - 1; }
+      probe.remove();
+      return lo;
+    }
+    ta.addEventListener('input', render);
+    edit.addEventListener('click', function () { var on = ta.classList.toggle('on'); edit.textContent = on ? 'Done editing' : 'Edit'; if (on) ta.focus(); });
+    copy.addEventListener('click', function () {
+      var t = ta.value, done = function () { copy.textContent = 'Copied'; copy.classList.add('done'); setTimeout(function () { copy.textContent = 'Copy text'; copy.classList.remove('done'); }, 1400); };
+      if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(t).then(done, fb); else fb();
+      function fb() { ta.style.display = 'block'; ta.select(); try { document.execCommand('copy'); done(); } catch (e) {} ta.style.display = ''; }
+    });
+    render();
+    window.addEventListener('resize', render);
+  });
+})();
+</script>
+</body>
+</html>

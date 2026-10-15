@@ -1,0 +1,386 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>LinkedIn Analytics</title>
+<style>
+  .viz-root {
+    color-scheme: light;
+    --page: #f9f9f7; --surface-1: #fcfcfb; --text-primary: #0b0b0b; --text-secondary: #52514e; --muted: #898781;
+    --grid: #e1e0d9; --axis: #c3c2b7; --border: rgba(11,11,11,0.10);
+    --series-1: #2a78d6; --div-pos: #2a78d6; --div-neg: #e34948; --neutral: #f0efec; --good-text: #006300;
+    --mono: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:where(:not([data-theme="light"])) .viz-root {
+      color-scheme: dark;
+      --page: #0d0d0d; --surface-1: #1a1a19; --text-primary: #f0efec; --text-secondary: #c3c2b7; --muted: #898781;
+      --grid: #2c2c2a; --axis: #383835; --border: rgba(255,255,255,0.10);
+      --series-1: #3987e5; --div-pos: #3987e5; --div-neg: #e66767; --neutral: #383835; --good-text: #0ca30c;
+    }
+  }
+  :root[data-theme="dark"] .viz-root {
+    color-scheme: dark;
+    --page: #0d0d0d; --surface-1: #1a1a19; --text-primary: #f0efec; --text-secondary: #c3c2b7; --muted: #898781;
+    --grid: #2c2c2a; --axis: #383835; --border: rgba(255,255,255,0.10);
+    --series-1: #3987e5; --div-pos: #3987e5; --div-neg: #e66767; --neutral: #383835; --good-text: #0ca30c;
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; }
+  body.viz-root { background: var(--page); color: var(--text-primary); font: 14.5px/1.5 system-ui, -apple-system, "Segoe UI", sans-serif; }
+  .wrap { max-width: 1080px; margin: 0 auto; padding: 28px 16px 64px; }
+  header { display: flex; justify-content: space-between; align-items: baseline; flex-wrap: wrap; gap: 8px; margin-bottom: 18px; }
+  h1 { font-size: 21px; margin: 0; }
+  .meta { color: var(--text-secondary); font-size: 13px; }
+  .card { background: var(--surface-1); border: 1px solid var(--border); border-radius: 14px; padding: 20px; margin-bottom: 16px; }
+  h2 { font-size: 15px; margin: 0 0 4px; }
+  .sub { color: var(--text-secondary); font-size: 13px; margin: 0 0 14px; }
+  .hero { display: grid; grid-template-columns: minmax(200px, 1fr) 2fr; gap: 20px; align-items: center; }
+  @media (max-width: 720px) { .hero { grid-template-columns: 1fr; } }
+  .hero .big { font-size: 52px; font-weight: 650; letter-spacing: -.02em; line-height: 1; }
+  .hero .lbl { color: var(--text-secondary); margin-top: 6px; }
+  .tiles { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 10px; }
+  .tile { border: 1px solid var(--border); border-radius: 10px; padding: 10px 12px; }
+  .tile .l { color: var(--text-secondary); font-size: 12.5px; }
+  .tile .v { font-size: 22px; font-weight: 600; margin-top: 2px; }
+  .grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  @media (max-width: 820px) { .grid2 { grid-template-columns: 1fr; } }
+  .chart { position: relative; width: 100%; }
+  .chart svg { display: block; width: 100%; overflow: visible; }
+  .tip { position: absolute; pointer-events: none; background: var(--surface-1); border: 1px solid var(--border); border-radius: 8px;
+         padding: 6px 9px; font-size: 12.5px; box-shadow: 0 4px 14px rgba(0,0,0,.12); white-space: nowrap; display: none; z-index: 5; }
+  .tip b { font-size: 14px; }
+  .tip .k { display: inline-block; width: 12px; height: 2px; background: var(--series-1); vertical-align: middle; margin-right: 6px; }
+  details.dt { margin-top: 8px; font-size: 13px; color: var(--text-secondary); }
+  details.dt table { margin-top: 6px; }
+  table { width: 100%; border-collapse: collapse; font-size: 13.5px; }
+  th, td { text-align: left; padding: 7px 8px; border-bottom: 1px solid var(--grid); vertical-align: top; }
+  th { color: var(--text-secondary); font-weight: 600; font-size: 12.5px; cursor: pointer; user-select: none; white-space: nowrap; }
+  td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; }
+  .tblwrap { overflow-x: auto; max-height: 520px; overflow-y: auto; }
+  .insights { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 10px; }
+  .ins { border: 1px solid var(--border); border-radius: 10px; padding: 12px 14px; }
+  .ins .kind { font-size: 11.5px; font-weight: 700; text-transform: uppercase; letter-spacing: .06em; color: var(--text-secondary); }
+  .ins .kind span { margin-right: 4px; }
+  .ins .t { font-weight: 600; margin: 4px 0 2px; }
+  .ins .d { color: var(--text-secondary); font-size: 13.5px; }
+  .lifts { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 18px 26px; }
+  .lift h3 { font-size: 13.5px; margin: 0 0 6px; }
+  .legend { display: flex; gap: 16px; font-size: 12.5px; color: var(--text-secondary); margin-bottom: 12px; flex-wrap: wrap; }
+  .legend i { display: inline-block; width: 10px; height: 10px; border-radius: 2px; margin-right: 6px; vertical-align: -1px; }
+  .note { color: var(--text-secondary); font-size: 12.5px; margin-top: 8px; }
+  .kv { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 6px 18px; font-size: 13.5px; }
+  .kv div span { color: var(--text-secondary); }
+  .demo { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 18px 26px; }
+  a { color: var(--series-1); }
+  footer { text-align: center; color: var(--muted); font-size: 12.5px; margin-top: 24px; }
+  .empty { padding: 80px 20px; text-align: center; color: var(--text-secondary); }
+</style>
+</head>
+<body class="viz-root">
+<div class="wrap" id="app"><div class="empty">Loading… If this stays empty, <code>data.js</code> is missing next to this file.</div></div>
+<div class="tip" id="tip"></div>
+<script src="data.js"></script>
+<script>
+(function () {
+  var D = window.DASH;
+  if (!D) return;
+  var app = document.getElementById('app'), tip = document.getElementById('tip');
+  var NS = 'http://www.w3.org/2000/svg';
+  var A = D.analytics || {}, S = D.stats || null, V = D.voice || null, P = D.posts || [];
+  var draws = [];
+  function queue(fn) { draws.push(fn); }
+  function drawAll() { draws.forEach(function (f) { f(); }); }
+
+  function el(tag, attrs, parent, text) {
+    var e = document.createElement(tag);
+    if (attrs) for (var k in attrs) e.setAttribute(k, attrs[k]);
+    if (text != null) e.textContent = text;
+    if (parent) parent.appendChild(e);
+    return e;
+  }
+  function sv(tag, attrs, parent) {
+    var e = document.createElementNS(NS, tag);
+    for (var k in attrs) e.setAttribute(k, attrs[k]);
+    if (parent) parent.appendChild(e);
+    return e;
+  }
+  function compact(n) {
+    if (n == null || isNaN(n)) return '–';
+    var a = Math.abs(n);
+    if (a >= 1e6) return (n / 1e6).toFixed(a >= 1e7 ? 0 : 1).replace(/\.0$/, '') + 'M';
+    if (a >= 1e3) return (n / 1e3).toFixed(a >= 1e4 ? 0 : 1).replace(/\.0$/, '') + 'K';
+    return String(Math.round(n));
+  }
+  function fmt(n) { return n == null ? '–' : Number(n).toLocaleString(); }
+  function pct(x) { return x == null ? '–' : (100 * x).toFixed(x < 0.1 ? 1 : 0) + '%'; }
+  function med(xs) { xs = xs.filter(function (x) { return x != null; }).sort(function (a, b) { return a - b; }); if (!xs.length) return null; var m = xs.length >> 1; return xs.length % 2 ? xs[m] : (xs[m - 1] + xs[m]) / 2; }
+  function niceMax(v) { if (!v) return 1; var p = Math.pow(10, Math.floor(Math.log10(v))); var f = v / p; return (f <= 1 ? 1 : f <= 2 ? 2 : f <= 2.5 ? 2.5 : f <= 5 ? 5 : 10) * p; }
+  function showTip(html, x, y) {
+    tip.textContent = '';
+    html.forEach(function (row, i) { var d = el('div', null, tip); if (row.key) el('span', { class: 'k' }, d); var b = el(i === 0 ? 'b' : 'span', null, d, row.text); });
+    tip.style.display = 'block';
+    var w = tip.offsetWidth, h = tip.offsetHeight;
+    var left = Math.min(window.scrollX + document.documentElement.clientWidth - w - 8, x + 14);
+    tip.style.left = Math.max(8, left) + 'px'; tip.style.top = (y - h - 10) + 'px';
+  }
+  function hideTip() { tip.style.display = 'none'; }
+
+  // ---------- Line chart (single series, crosshair + tooltip, area wash) ----------
+  function lineChart(container, pts, opts) {
+    function draw() {
+      container.textContent = '';
+      var W = Math.max(280, container.clientWidth), H = opts.height || 220, m = { l: 44, r: 54, t: 12, b: 26 };
+      var svg = sv('svg', { viewBox: '0 0 ' + W + ' ' + H, role: 'img', 'aria-label': opts.label }, container);
+      if (!pts.length) return;
+      var dmax = Math.max.apply(null, pts.map(function (p) { return p.y; })) || 1;
+      var step = niceMax(dmax / 4), ymax = Math.ceil(dmax * 1.04 / step) * step, nt = Math.round(ymax / step);
+      var x = function (i) { return m.l + (W - m.l - m.r) * (pts.length === 1 ? 0.5 : i / (pts.length - 1)); };
+      var y = function (v) { return m.t + (H - m.t - m.b) * (1 - v / ymax); };
+      for (var k = 0; k <= nt; k++) {
+        var v = step * k, yy = y(v);
+        sv('line', { x1: m.l, x2: W - m.r, y1: yy, y2: yy, stroke: k === 0 ? 'var(--axis)' : 'var(--grid)', 'stroke-width': 1 }, svg);
+        var t = sv('text', { x: m.l - 8, y: yy + 4, 'text-anchor': 'end', 'font-size': 11, fill: 'var(--muted)' }, svg); t.textContent = compact(v);
+      }
+      var lastMonth = null, lastX = -1e9;
+      pts.forEach(function (p, i) {
+        var mo = p.x.slice(0, 7);
+        if (mo !== lastMonth) {
+          lastMonth = mo;
+          if (x(i) - lastX < 34) return;
+          lastX = x(i);
+          var t = sv('text', { x: x(i), y: H - 6, 'text-anchor': 'middle', 'font-size': 11, fill: 'var(--muted)' }, svg);
+          t.textContent = new Date(p.x + 'T00:00:00').toLocaleDateString(undefined, { month: 'short' });
+        }
+      });
+      var d = pts.map(function (p, i) { return (i ? 'L' : 'M') + x(i).toFixed(1) + ' ' + y(p.y).toFixed(1); }).join(' ');
+      sv('path', { d: d + ' L' + x(pts.length - 1) + ' ' + y(0) + ' L' + x(0) + ' ' + y(0) + ' Z', fill: 'var(--series-1)', 'fill-opacity': 0.1, stroke: 'none' }, svg);
+      sv('path', { d: d, fill: 'none', stroke: 'var(--series-1)', 'stroke-width': 2, 'stroke-linejoin': 'round', 'stroke-linecap': 'round' }, svg);
+      var li = pts.length - 1;
+      sv('circle', { cx: x(li), cy: y(pts[li].y), r: 4, fill: 'var(--series-1)', stroke: 'var(--surface-1)', 'stroke-width': 2 }, svg);
+      var et = sv('text', { x: x(li) + 8, y: y(pts[li].y) + 4, 'font-size': 11.5, fill: 'var(--text-secondary)' }, svg); et.textContent = compact(pts[li].y);
+      var hair = sv('line', { y1: m.t, y2: H - m.b, stroke: 'var(--axis)', 'stroke-width': 1, visibility: 'hidden' }, svg);
+      var dot = sv('circle', { r: 4, fill: 'var(--series-1)', stroke: 'var(--surface-1)', 'stroke-width': 2, visibility: 'hidden' }, svg);
+      var hit = sv('rect', { x: m.l, y: m.t, width: W - m.l - m.r, height: H - m.t - m.b, fill: 'transparent' }, svg);
+      function move(ev) {
+        var r = svg.getBoundingClientRect(), px = (ev.clientX - r.left) * W / r.width;
+        var i = Math.max(0, Math.min(pts.length - 1, Math.round((px - m.l) / (W - m.l - m.r) * (pts.length - 1))));
+        hair.setAttribute('x1', x(i)); hair.setAttribute('x2', x(i)); hair.setAttribute('visibility', 'visible');
+        dot.setAttribute('cx', x(i)); dot.setAttribute('cy', y(pts[i].y)); dot.setAttribute('visibility', 'visible');
+        showTip([{ text: fmt(pts[i].y) + ' ' + opts.unit, key: true }, { text: opts.xLabel(pts[i].x) }], ev.pageX, ev.pageY);
+      }
+      hit.addEventListener('mousemove', move);
+      hit.addEventListener('mouseleave', function () { hair.setAttribute('visibility', 'hidden'); dot.setAttribute('visibility', 'hidden'); hideTip(); });
+    }
+    queue(draw);
+  }
+  function dataTable(parent, label, header, rows) {
+    var det = el('details', { class: 'dt' }, parent); el('summary', null, det, label);
+    var tb = el('table', null, det), tr = el('tr', null, el('thead', null, tb));
+    header.forEach(function (h, i) { el('th', i ? { class: 'num' } : null, tr, h); });
+    var body = el('tbody', null, tb);
+    rows.forEach(function (r) { var t = el('tr', null, body); r.forEach(function (c, i) { el('td', i ? { class: 'num' } : null, t, c); }); });
+  }
+
+  // ---------- Horizontal bars ----------
+  function roundedBar(x0, y0, w, h, dir) {
+    var r = Math.min(4, Math.abs(w), h / 2);
+    if (w <= 0.5) return '';
+    if (dir > 0) return 'M' + x0 + ' ' + y0 + ' h' + (w - r) + ' a' + r + ' ' + r + ' 0 0 1 ' + r + ' ' + r + ' v' + (h - 2 * r) + ' a' + r + ' ' + r + ' 0 0 1 ' + (-r) + ' ' + r + ' h' + (-(w - r)) + ' Z';
+    return 'M' + x0 + ' ' + y0 + ' h' + (-(w - r)) + ' a' + r + ' ' + r + ' 0 0 0 ' + (-r) + ' ' + r + ' v' + (h - 2 * r) + ' a' + r + ' ' + r + ' 0 0 0 ' + r + ' ' + r + ' h' + (w - r) + ' Z';
+  }
+  function liftChart(container, rows) {
+    function draw() {
+      container.textContent = '';
+      var W = Math.max(280, container.clientWidth), rowH = 26, labW = Math.min(150, W * 0.36), valW = 86, H = rows.length * rowH + 4;
+      var svg = sv('svg', { viewBox: '0 0 ' + W + ' ' + H, role: 'img' }, container);
+      var maxd = Math.max(1, Math.max.apply(null, rows.map(function (r) { return Math.abs(Math.log2(Math.max(r.lift, 0.05))); })));
+      var cx = labW + (W - labW - valW) / 2, half = (W - labW - valW) / 2 - 4;
+      sv('line', { x1: cx, x2: cx, y1: 0, y2: H, stroke: 'var(--axis)', 'stroke-width': 1 }, svg);
+      rows.forEach(function (r, i) {
+        var yy = i * rowH + 6, d = Math.log2(Math.max(r.lift, 0.05)), w = Math.abs(d) / maxd * half, dir = d >= 0 ? 1 : -1;
+        var small = r.n < 3;
+        var lt = sv('text', { x: 0, y: yy + 11, 'font-size': 12.5, fill: small ? 'var(--muted)' : 'var(--text-primary)' }, svg);
+        lt.textContent = (r.group.length > 22 ? r.group.slice(0, 21) + '…' : r.group);
+        var path = roundedBar(cx, yy, Math.max(w, 1.5), 14, dir);
+        var bar = sv('path', { d: path, fill: dir > 0 ? 'var(--div-pos)' : 'var(--div-neg)', 'fill-opacity': small ? 0.35 : 1 }, svg);
+        var vt = sv('text', { x: W - valW + 6, y: yy + 11, 'font-size': 12, fill: 'var(--text-secondary)' }, svg);
+        vt.textContent = r.lift.toFixed(2).replace(/0$/, '') + 'x · n=' + r.n;
+        var hit = sv('rect', { x: 0, y: i * rowH, width: W, height: rowH, fill: 'transparent' }, svg);
+        hit.addEventListener('mousemove', function (ev) {
+          showTip([{ text: r.lift + 'x your median' }, { text: r.group + ' · ' + r.n + ' post' + (r.n === 1 ? '' : 's') + (small ? ' (small sample)' : '') },
+                   { text: 'Median ' + fmt(Math.round(r.median)) + (r.median_er != null ? ' · ER ' + (100 * r.median_er).toFixed(2) + '%' : '') }], ev.pageX, ev.pageY);
+        });
+        hit.addEventListener('mouseleave', hideTip);
+      });
+    }
+    queue(draw);
+  }
+  function barList(container, rows) {
+    function draw() {
+      container.textContent = '';
+      var W = Math.max(260, container.clientWidth), rowH = 26, labW = Math.min(170, W * 0.42), valW = 48, H = rows.length * rowH + 4;
+      var svg = sv('svg', { viewBox: '0 0 ' + W + ' ' + H, role: 'img' }, container);
+      var max = Math.max.apply(null, rows.map(function (r) { return r.pct || 0; })) || 1;
+      sv('line', { x1: labW, x2: labW, y1: 0, y2: H, stroke: 'var(--axis)', 'stroke-width': 1 }, svg);
+      rows.forEach(function (r, i) {
+        var yy = i * rowH + 6, w = (r.pct || 0) / max * (W - labW - valW - 6);
+        var lt = sv('text', { x: 0, y: yy + 11, 'font-size': 12.5, fill: 'var(--text-primary)' }, svg);
+        lt.textContent = r.value.length > 26 ? r.value.slice(0, 25) + '…' : r.value;
+        sv('path', { d: roundedBar(labW, yy, Math.max(w, 1.5), 14, 1), fill: 'var(--series-1)' }, svg);
+        var vt = sv('text', { x: labW + w + 6, y: yy + 11, 'font-size': 12, fill: 'var(--text-secondary)' }, svg);
+        vt.textContent = r.pct < 0.01 ? '<1%' : pct(r.pct);
+        var hit = sv('rect', { x: 0, y: i * rowH, width: W, height: rowH, fill: 'transparent' }, svg);
+        hit.addEventListener('mousemove', function (ev) { showTip([{ text: r.pct < 0.01 ? '<1%' : pct(r.pct) }, { text: r.value }], ev.pageX, ev.pageY); });
+        hit.addEventListener('mouseleave', hideTip);
+      });
+    }
+    queue(draw);
+  }
+
+  // ---------- Page ----------
+  app.textContent = '';
+  var hd = el('header', null, app);
+  el('h1', null, hd, 'LinkedIn analytics' + (D.name ? ' · ' + D.name : ''));
+  el('div', { class: 'meta' }, hd, [A.discovery && A.discovery.period, 'generated ' + D.generated].filter(Boolean).join(' · '));
+
+  var withM = P.filter(function (p) { return p.impressions != null; });
+  var hero = el('section', { class: 'card hero' }, app);
+  var hl = el('div', null, hero);
+  var totalImp = (A.discovery && A.discovery.impressions) || withM.reduce(function (s, p) { return s + p.impressions; }, 0);
+  el('div', { class: 'big' }, hl, compact(totalImp));
+  el('div', { class: 'lbl' }, hl, 'impressions in the export period');
+  var tiles = el('div', { class: 'tiles' }, hero);
+  function tile(l, v) { var t = el('div', { class: 'tile' }, tiles); el('div', { class: 'l' }, t, l); el('div', { class: 'v' }, t, v); }
+  if (A.discovery && A.discovery.members_reached) tile('Members reached', compact(A.discovery.members_reached));
+  if (A.followers && A.followers.total != null) tile('Followers', compact(A.followers.total));
+  var newF = (A.followers && A.followers.daily || []).reduce(function (s, d) { return s + (d.new || 0); }, 0);
+  if (newF) tile('New followers', '+' + compact(newF));
+  tile('Posts analyzed', String((S && S.n) || P.filter(function (p) { return p.first_line; }).length || P.length));
+  var medImp = (S && S.metric === 'impressions' && S.overall_median != null) ? S.overall_median : med(withM.map(function (p) { return p.impressions; }));
+  if (medImp != null) tile('Median impressions / post', compact(medImp));
+  var er = (S && S.overall_median_er != null) ? S.overall_median_er : med(P.map(function (p) { return p.engagement_rate; }));
+  if (er != null) tile('Median engagement rate', (100 * er).toFixed(2) + '%');
+
+  if (D.insights && D.insights.length) {
+    var ic = el('section', { class: 'card' }, app);
+    el('h2', null, ic, 'What to do next');
+    el('p', { class: 'sub' }, ic, 'From your own numbers, not general benchmarks.');
+    var grid = el('div', { class: 'insights' }, ic);
+    var icon = { do: '↑', stop: '×', test: '?', keep: '✓' }, name = { do: 'Do more', stop: 'Stop', test: 'Test next', keep: 'Keep' };
+    D.insights.forEach(function (x) {
+      var c = el('div', { class: 'ins' }, grid);
+      var k = el('div', { class: 'kind' }, c); el('span', { 'aria-hidden': 'true' }, k, icon[x.kind] || '•'); k.appendChild(document.createTextNode(name[x.kind] || x.kind || 'Insight'));
+      el('div', { class: 't' }, c, x.title); el('div', { class: 'd' }, c, x.detail || '');
+    });
+  }
+
+  // Time series
+  if (A.daily && A.daily.length) {
+    var weeks = [];
+    for (var i = 0; i < A.daily.length; i += 7) {
+      var chunk = A.daily.slice(i, i + 7);
+      weeks.push({ x: chunk[0].date, y: chunk.reduce(function (s, d) { return s + (d.impressions || 0); }, 0), e: chunk.reduce(function (s, d) { return s + (d.engagements || 0); }, 0), days: chunk.length });
+    }
+    if (weeks.length > 1 && weeks[weeks.length - 1].days < 7) weeks.pop();
+    var g2 = el('div', { class: 'grid2' }, app);
+    var c1 = el('section', { class: 'card' }, g2);
+    el('h2', null, c1, 'Impressions per week');
+    el('p', { class: 'sub' }, c1, 'All your content combined, summed by week.');
+    lineChart(el('div', { class: 'chart' }, c1), weeks, { label: 'Impressions per week', unit: 'impressions', height: 220, xLabel: function (s) { return 'Week of ' + s; } });
+    dataTable(c1, 'Show data', ['Week of', 'Impressions', 'Engagements'], weeks.map(function (w) { return [w.x, fmt(w.y), fmt(w.e)]; }));
+
+    if (A.followers && A.followers.daily && A.followers.daily.length) {
+      var fd = A.followers.daily, tot = A.followers.total, gained = fd.reduce(function (s, d) { return s + (d.new || 0); }, 0);
+      var run = (tot != null ? tot - gained : 0), fw = [];
+      for (var j = 0; j < fd.length; j++) { run += fd[j].new || 0; if (j % 7 === 6 || j === fd.length - 1) fw.push({ x: fd[j].date, y: run }); }
+      var c2 = el('section', { class: 'card' }, g2);
+      el('h2', null, c2, 'Followers');
+      el('p', { class: 'sub' }, c2, tot != null ? 'Total followers, end of each week.' : 'Cumulative new followers in the period.');
+      lineChart(el('div', { class: 'chart' }, c2), fw, { label: 'Followers over time', unit: 'followers', height: 220, xLabel: function (s) { return s; } });
+      dataTable(c2, 'Show data', ['Week ending', 'Followers'], fw.map(function (w) { return [w.x, fmt(w.y)]; }));
+    }
+  }
+
+  // What works for you
+  if (S && S.groups) {
+    var wc = el('section', { class: 'card' }, app);
+    el('h2', null, wc, 'What works for you');
+    el('p', { class: 'sub' }, wc, 'Median ' + S.metric + ' per group, relative to your overall median (' + fmt(Math.round(S.overall_median)) + '). Faded bars have fewer than 3 posts.');
+    var lg = el('div', { class: 'legend' }, wc);
+    var a1 = el('span', null, lg); el('i', { style: 'background:var(--div-pos)' }, a1); a1.appendChild(document.createTextNode('Above your median'));
+    var a2 = el('span', null, lg); el('i', { style: 'background:var(--div-neg)' }, a2); a2.appendChild(document.createTextNode('Below your median'));
+    var lifts = el('div', { class: 'lifts' }, wc);
+    Object.keys(S.groups).forEach(function (k) {
+      var rows = S.groups[k].filter(function (r) { return r.lift != null; });
+      if (rows.length < 2) return;
+      var box = el('div', { class: 'lift' }, lifts);
+      el('h3', null, box, 'By ' + k);
+      liftChart(el('div', { class: 'chart' }, box), rows);
+    });
+    if (S.n) el('div', { class: 'note' }, wc, 'Based on ' + S.n + ' posts with metrics. Correlation, not causation: use these as hypotheses to test.');
+  }
+
+  // Posts table
+  if (P.length) {
+    var pc = el('section', { class: 'card' }, app);
+    el('h2', null, pc, 'Your posts');
+    el('p', { class: 'sub' }, pc, 'Click a column to sort.');
+    var wrap = el('div', { class: 'tblwrap' }, pc), tb = el('table', null, wrap);
+    var cols = [['date', 'Date', false], ['first_line', 'Opening line', false], ['impressions', 'Impressions', true], ['engagements', 'Engagements', true], ['engagement_rate', 'ER', true], ['chars', 'Chars', true]];
+    var htr = el('tr', null, el('thead', null, tb)), body = el('tbody', null, tb), sortKey = 'impressions', asc = false;
+    cols.forEach(function (c) { var th = el('th', c[2] ? { class: 'num' } : null, htr, c[1]); th.addEventListener('click', function () { asc = sortKey === c[0] ? !asc : !c[2]; sortKey = c[0]; render(); }); });
+    function render() {
+      body.textContent = '';
+      P.slice().sort(function (a, b) { var x = a[sortKey], y = b[sortKey]; if (x == null) return 1; if (y == null) return -1; return (x > y ? 1 : x < y ? -1 : 0) * (asc ? 1 : -1); })
+        .forEach(function (p) {
+          var tr = el('tr', null, body);
+          el('td', null, tr, (p.date || '').slice(0, 10));
+          var td = el('td', null, tr);
+          if (p.url) { var a = el('a', { href: p.url, target: '_blank', rel: 'noopener' }, td, p.first_line || '(no text)'); } else td.textContent = p.first_line || '(no text)';
+          el('td', { class: 'num' }, tr, fmt(p.impressions));
+          el('td', { class: 'num' }, tr, fmt(p.engagements));
+          el('td', { class: 'num' }, tr, p.engagement_rate == null ? '–' : (100 * p.engagement_rate).toFixed(2) + '%');
+          el('td', { class: 'num' }, tr, fmt(p.chars));
+        });
+    }
+    render();
+  }
+
+  // Audience
+  if (A.demographics && Object.keys(A.demographics).length) {
+    var ac = el('section', { class: 'card' }, app);
+    el('h2', null, ac, 'Who sees your content');
+    el('p', { class: 'sub' }, ac, 'Top audience segments from your analytics export. Compare with the audience you want to reach.');
+    var dg = el('div', { class: 'demo' }, ac);
+    Object.keys(A.demographics).forEach(function (k) {
+      var rows = A.demographics[k].slice(0, 6);
+      if (!rows.length) return;
+      var box = el('div', null, dg); el('h3', { style: 'font-size:13.5px;margin:0 0 6px' }, box, k);
+      barList(el('div', { class: 'chart' }, box), rows);
+    });
+  }
+
+  // Voice
+  if (V) {
+    var vc = el('section', { class: 'card' }, app);
+    el('h2', null, vc, 'Your writing style');
+    el('p', { class: 'sub' }, vc, 'Measured from ' + V.posts_analyzed + ' of your posts. New drafts are checked against this.');
+    var kv = el('div', { class: 'kv' }, vc);
+    [['Typical length', fmt(V.median_chars) + ' chars'], ['Words per sentence', V.avg_sentence_words], ['Emoji per post', V.emoji_per_post],
+     ['Hashtags per post', V.hashtags_per_post], ['Posts ending in a question', pct(V.share_ending_with_question)], ['Posts with a list', pct(V.share_with_lists)]]
+      .forEach(function (x) { var d = el('div', null, kv); el('span', null, d, x[0] + ': '); d.appendChild(document.createTextNode(String(x[1]))); });
+    if (V.signature_phrases && V.signature_phrases.length) el('div', { class: 'note' }, vc, 'Phrases you use a lot: ' + V.signature_phrases.slice(0, 8).join(', '));
+  }
+
+  drawAll();
+  var rt; window.addEventListener('resize', function () { clearTimeout(rt); rt = setTimeout(drawAll, 120); });
+  var ft = el('footer', null, app);
+  ft.appendChild(document.createTextNode('Built from your own LinkedIn exports by the open-source '));
+  el('a', { href: 'https://github.com/Dynode-ai/linkedin-skill' }, ft, 'LinkedIn skill for Claude Code');
+  ft.appendChild(document.createTextNode('. Your data never left your computer.'));
+})();
+</script>
+</body>
+</html>

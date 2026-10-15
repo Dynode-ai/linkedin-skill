@@ -1,0 +1,28 @@
+{
+  "$schema": "https://anthropic.com/claude-code/marketplace.schema.json",
+  "name": "linkedin-skill",
+  "description": "A LinkedIn growth strategist for Claude Code: profile audits, niche research, real accounts to follow (never-guessed links), content ideas, posts in your voice, and analytics from your own exports.",
+  "owner": {
+    "name": "Dynode.ai",
+    "url": "https://github.com/Dynode-ai"
+  },
+  "plugins": [
+    {
+      "name": "linkedin",
+      "source": "./plugins/linkedin",
+      "description": "Audit and rewrite your LinkedIn profile (100-point score + HTML report), analyze your niche, find real accounts to follow (links from actual search results, never guessed), get content ideas, write posts in your voice with an anti-AI-slop checker, and turn your own LinkedIn exports into personal benchmarks. No scraping, no API keys.",
+      "version": "1.0.0",
+      "category": "productivity",
+      "tags": [
+        "linkedin",
+        "personal-brand",
+        "content",
+        "copywriting",
+        "social-media",
+        "marketing",
+        "career",
+        "analytics"
+      ]
+    }
+  ]
+}
