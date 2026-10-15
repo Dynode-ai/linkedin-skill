@@ -24,7 +24,7 @@
   .slide .body { flex: 1; display: flex; flex-direction: column; justify-content: center; min-height: 0; }
   .kicker { font-size: 34px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: var(--accent); margin-bottom: 36px; }
   .title { font-size: 96px; line-height: 1.05; font-weight: 800; letter-spacing: -.02em; margin: 0; }
-  .slide.point .title, .slide.list .title, .slide.cta .title { font-size: 72px; }
+  .slide.type-point .title, .slide.type-list .title, .slide.type-cta .title { font-size: 72px; }
   .subtitle { font-size: 40px; line-height: 1.3; color: var(--muted); margin-top: 40px; }
   .num { font-size: 140px; font-weight: 800; color: var(--accent); line-height: 1; margin-bottom: 30px; letter-spacing: -.03em; }
   .text { font-size: 44px; line-height: 1.38; margin-top: 44px; color: var(--fg); opacity: .92; white-space: pre-line; }
@@ -76,7 +76,7 @@
 
   (C.slides || []).forEach(function (s, i) {
     var holder = el('div', 'holder', deck);
-    var sl = el('div', 'slide ' + (s.type || 'point'), holder);
+    var sl = el('div', 'slide type-' + (s.type || 'point'), holder);
     var body = el('div', 'body', sl);
     switch (s.type) {
       case 'cover':
